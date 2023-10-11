@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: crif-poc-aap-template
+  namespace: openshift-gitops
+  labels:
+    inherit.from.global: "true"
+spec:
+  destination:
+    namespace: aap
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    path: argo/ansibleJobTemplates
+    repoURL: https://github.com/neenspa/crif-poc-aap-template
+    targetRevision: main
+  syncPolicy:
+    automated: 
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - RespectIgnoreDifferences=true
+    - ApplyOutOfSyncOnly=true    
+    retry:
+      backoff:
+        duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+        factor: 2 # a factor to multiply the base duration after each failed retry
+        maxDuration: 10m # the maximum amount of time allowed for the backoff strategy
